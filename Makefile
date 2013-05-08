@@ -3,6 +3,8 @@ OBJ_DIR = obj
 INC_DIR = inc
 DST_DIR = dist
 TST_DIR = test
+BIN_DIR = bin
+LOG_DIR = logs
 
 CC      = g++
 CCFLAGS  = -I${INC_DIR}
@@ -16,6 +18,7 @@ all: ${TARGET}.o distributable  ${TEST}.o ${TEST}
 
 ${TEST}: ${OBJ_DIR}/${TEST}.o ${OBJ_DIR}/${TARGET}.o
 	$(CC) -o $@ $^ -L${DST_DIR} $(LDFLAGS) -ltracktimestamps
+	mv ${TEST} ${BIN_DIR}/
 
 ${TARGET}.o: ${SRC_DIR}/${TARGET}.cpp ${INC_DIR}/${TARGET}.h
 	$(CC) -Wall -c $(CCFLAGS) $<
@@ -34,12 +37,22 @@ clean:
 	rm ${DST_DIR}/*.a
 
 cleantest: clean
-	rm ${TEST}
+	rm ${BIN_DIR}/${TEST}
 	rm *.dat
+	rm ${LOG_DIR}/*.log
 	rm *.png
 
 plot:
-	gnuplot -e "set term png; set output 'times.png'; plot 'times.dat'"
+	gnuplot -e "set term png; set output 'times.png'; set autoscale; set title 'Measured Times'; set xlabel 'Test Nr'; set ylabel 'Time (ns)';  plot 'times.dat' with linespoints"
 
-displayplot:
+displayplot: plot
 	eog times.png
+
+runtest:
+	valgrind --tool=memcheck --leak-check=yes --log-file=${TEST}-valgrind.log  -v ${BIN_DIR}/${TEST}
+	mv ${TEST}-valgrind.log ${LOG_DIR}/
+
+runreapetedtest:
+	for x in 1 2 3 4 5 ; do \
+		${BIN_DIR}/${TEST} 10 ; \
+	done

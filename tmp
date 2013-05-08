@@ -1,0 +1,26 @@
+main {
+
+Factory f  =  TCFactory.getInstance();
+
+TestBenchFramework tbc = new TestBenchFramework();
+tbc.setFactory(f);
+tbc.setConfigurationFile("pippo");
+tbc.run();
+
+}
+
+
+TI = {TI1, .. , TIn}
+
+TC = {TIx}
+
+***************************************************
+
+python script to generae
+1. TC by TI 
+	TI class name to be provided
+2. Main File
+
+***************************************************
+
+compilation afterwards
